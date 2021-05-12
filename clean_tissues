@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue May 11 16:11:41 2021
+
+@author: kaouther
+"""
+import pandas as pd
+import re
+from collections import Counter
+
+
+
+#path = '/home/kaouther/Documents/Internship/pre_process/input_files/TabulaMuris_Senis_Brain.txt'
+#path = input('Paste the absolute path to the file') #enter the path to the heart_forKaouther.xlsx
+path = '/home/kaouther/Documents/Internship/pre_process/input_files/TabulaMuris_Senis_Brain.txt'
+
+df = pd.read_csv(path, delimiter = "\t")
+
+
+#get columns names
+
+columns = list(df.columns)
+columns.remove('gene')
+new_columns =[]
+
+for column in columns:
+    match = re.search('\-?\d+', column)
+    if match:
+        found = match.group()
+        print(column.replace(found,''))
+        new_columns.append(column.replace(found,''))
+copy =  new_columns[:]
+copy[0:0] = ['gene']
+
+df.columns = copy
+        
+number_occurences = Counter(new_columns)
+
+final_columns=[]
+
+for occurence in number_occurences:
+    if number_occurences[occurence] != 1:
+        for i in range(0,number_occurences[occurence],1):
+            final_columns.append(occurence+str(i+1))
+    else:
+        final_columns.append(occurence+'1')
+            
+copy =  final_columns[:]
+copy[0:0] = ['gene']
+
+df.columns = copy
+path2 = '/home/kaouther/Documents/Internship/pre_process/input_files/clean/TabulaMuris_Senis_Brain.xlsx'
+df.to_excel (path2, index = False, header=True)
